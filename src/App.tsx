@@ -1,7 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { calculate, defaultInputs, type Inputs } from "./calc";
 import Chart from "./Chart";
 import logo from "./assets/logo.svg";
+
+const STORAGE_KEY = "rent-vs-buy-inputs";
+
+const loadInputs = (): Inputs => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultInputs;
+    const parsed = JSON.parse(raw);
+    return { ...defaultInputs, ...parsed };
+  } catch {
+    return defaultInputs;
+  }
+};
 
 const fmt = (n: number) =>
   Math.round(n).toLocaleString("ja-JP", { maximumFractionDigits: 0 });
@@ -47,8 +60,16 @@ function NumberInput({
 }
 
 export default function App() {
-  const [inputs, setInputs] = useState<Inputs>(defaultInputs);
+  const [inputs, setInputs] = useState<Inputs>(loadInputs);
   const [showInvestment, setShowInvestment] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs));
+    } catch {
+      // ignore storage errors
+    }
+  }, [inputs]);
 
   const set = <K extends keyof Inputs>(key: K) => (v: Inputs[K]) =>
     setInputs((prev) => ({ ...prev, [key]: v }));
