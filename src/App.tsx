@@ -26,6 +26,8 @@ function NumberInput({
   step,
   suffix,
   percent,
+  noStepper,
+  narrow,
 }: {
   label: string;
   value: number;
@@ -33,23 +35,55 @@ function NumberInput({
   step?: number;
   suffix?: string;
   percent?: boolean;
+  noStepper?: boolean;
+  narrow?: boolean;
 }) {
   const displayValue = percent ? +(value * 100).toPrecision(10) : value;
   const displayStep = step ?? (percent ? 0.1 : 1);
+  const actualStep = percent ? displayStep / 100 : displayStep;
+  const bump = (sign: 1 | -1) => {
+    const next = value + sign * actualStep;
+    // 浮動小数の誤差を丸める
+    const rounded = percent
+      ? Math.round(next * 1e6) / 1e6
+      : Math.round(next * 100) / 100;
+    onChange(Math.max(0, rounded));
+  };
   return (
     <div className="field">
       <label>{label}</label>
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <div className="input-wrap">
+        {!noStepper && (
+          <button
+            type="button"
+            className="stepper-btn"
+            aria-label="減らす"
+            onClick={() => bump(-1)}
+          >
+            −
+          </button>
+        )}
         <input
           type="number"
           value={displayValue}
           step={displayStep}
+          className={narrow ? "narrow" : ""}
           onChange={(e) => {
             const v = Number(e.target.value);
             onChange(percent ? v / 100 : v);
           }}
         />
-        <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+        {!noStepper && (
+          <button
+            type="button"
+            className="stepper-btn"
+            aria-label="増やす"
+            onClick={() => bump(1)}
+          >
+            +
+          </button>
+        )}
+        <span className="input-suffix">
           {percent ? "%" : suffix ?? ""}
         </span>
       </div>
@@ -118,7 +152,7 @@ export default function App() {
             suffix="回"
           />
           <NumberInput
-            label="引っ越し費用（1回あたり）"
+            label="引っ越し費用（1回）"
             value={inputs.moveCost}
             onChange={set("moveCost")}
             step={10000}
@@ -148,14 +182,14 @@ export default function App() {
             suffix="年"
           />
           <NumberInput
-            label="月額管理費"
+            label="管理費（月）"
             value={inputs.monthlyManagementFee}
             onChange={set("monthlyManagementFee")}
             step={1000}
             suffix="円"
           />
           <NumberInput
-            label="月額修繕積立費"
+            label="修繕積立費（月）"
             value={inputs.monthlyRepairFund}
             onChange={set("monthlyRepairFund")}
             step={1000}
@@ -175,40 +209,34 @@ export default function App() {
             step={10000}
             suffix="円"
           />
-          <div
-            style={{
-              borderTop: "1px solid #e2e8f0",
-              marginTop: 8,
-              paddingTop: 8,
-            }}
-          >
-            <p
-              className="section-title"
-              style={{ fontWeight: 600, marginBottom: 4 }}
-            >
-              住宅ローン控除
-            </p>
-            <NumberInput
-              label="控除率（年末残高×）"
-              value={inputs.deductionRate}
-              onChange={set("deductionRate")}
-              step={0.1}
-              percent
-            />
-            <NumberInput
-              label="控除期間（最大13年）"
-              value={inputs.deductionPeriod}
-              onChange={set("deductionPeriod")}
-              suffix="年"
-            />
-            <NumberInput
-              label="所得税＋住民税（年間上限）"
-              value={inputs.maxTaxDeduction}
-              onChange={set("maxTaxDeduction")}
-              step={10000}
-              suffix="円"
-            />
-          </div>
+          <details className="accordion">
+            <summary>住宅ローン控除</summary>
+            <div className="accordion-body">
+              <NumberInput
+                label="控除率（年末残高×）"
+                value={inputs.deductionRate}
+                onChange={set("deductionRate")}
+                step={0.1}
+                percent
+                noStepper
+              />
+              <NumberInput
+                label="控除期間（最大13年）"
+                value={inputs.deductionPeriod}
+                onChange={set("deductionPeriod")}
+                suffix="年"
+                noStepper
+              />
+              <NumberInput
+                label="所得税＋住民税（年間上限）"
+                value={inputs.maxTaxDeduction}
+                onChange={set("maxTaxDeduction")}
+                step={10000}
+                suffix="円"
+                noStepper
+              />
+            </div>
+          </details>
           <div
             style={{
               borderTop: "1px solid #e2e8f0",
@@ -222,6 +250,7 @@ export default function App() {
               onChange={set("resaleRatio")}
               step={1}
               percent
+              narrow
             />
             <div style={{ textAlign: "right", fontSize: "0.8rem", color: "#64748b", marginTop: 2 }}>
               → {fmt(inputs.propertyPrice * inputs.resaleRatio)}円

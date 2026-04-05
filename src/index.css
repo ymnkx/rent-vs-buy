@@ -106,6 +106,82 @@ body {
   border-color: var(--rent);
 }
 
+.field input.narrow {
+  width: 60px;
+}
+
+@media (max-width: 768px) {
+  .field input.narrow {
+    width: 50px;
+  }
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-suffix {
+  font-size: 0.8rem;
+  color: var(--muted);
+  min-width: 1em;
+}
+
+.stepper-btn {
+  display: none;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stepper-btn:active {
+  background: var(--bg);
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .stepper-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+  .input-wrap {
+    gap: 2px;
+  }
+  .field {
+    gap: 4px;
+  }
+  .field input {
+    width: 88px;
+    font-size: 0.85rem;
+    padding: 6px 6px;
+  }
+  .field label {
+    font-size: 0.78rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card {
+    padding: 16px 12px;
+  }
+}
+
 .common-input {
   display: flex;
   align-items: center;
@@ -304,6 +380,44 @@ body {
   font-size: 0.8rem;
   color: var(--muted);
   margin-bottom: 4px;
+}
+
+.accordion {
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.accordion > summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion > summary::before {
+  content: "▶";
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+  color: var(--muted);
+}
+
+.accordion[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.accordion-body {
+  padding-top: 8px;
 }
 
 .note {
