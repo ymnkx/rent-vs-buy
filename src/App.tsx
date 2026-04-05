@@ -19,8 +19,6 @@ const loadInputs = (): Inputs => {
 const fmt = (n: number) =>
   Math.round(n).toLocaleString("ja-JP", { maximumFractionDigits: 0 });
 
-const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
-
 function NumberInput({
   label,
   value,

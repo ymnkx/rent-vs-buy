@@ -156,7 +156,6 @@ export function calculate(inputs: Inputs): Result {
     deductionCum += deductionThisYear;
 
     const managementCum = (monthlyManagementFee + monthlyRepairFund) * 12 * y;
-    const fireInsuranceCum = Math.floor(y / 5) * fireInsurance5y;
     const propertyTaxCum = propertyTaxYear * y;
 
     const saleFee = (salePrice * 0.03 + 60000) * 1.1; // 仲介手数料
