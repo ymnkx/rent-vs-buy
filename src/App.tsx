@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { calculate, defaultInputs, type Inputs } from "./calc";
 import Chart from "./Chart";
+import logo from "./assets/logo.svg";
 
 const fmt = (n: number) =>
   Math.round(n).toLocaleString("ja-JP", { maximumFractionDigits: 0 });
@@ -64,8 +65,7 @@ export default function App() {
   return (
     <div className="app">
       <div className="title">
-        <h1>賃貸 vs 購入</h1>
-        <p>費用比較シミュレーター</p>
+        <img src={logo} alt="賃貸 vs 購入 費用比較シミュレーター" className="logo" />
       </div>
 
       {/* 年数スライダー */}
@@ -265,8 +265,17 @@ export default function App() {
 
         <div className="result-banner">
           {effectiveCheaper === "賃貸" ? "🏠" : "🏢"}{" "}
-          {effectiveCheaper}の方が安い（差額：{fmt(effectiveAbsDiff)}円）
-          {showInvestment && " ※運用込み"}
+          {effectiveCheaper}の方が安い
+          <br />
+          （差額：{fmt(effectiveAbsDiff)}円）
+          {showInvestment && (
+            <>
+              <br />
+              <span style={{ fontSize: "0.8rem", fontWeight: 400, color: "#64748b" }}>
+                ※運用込み
+              </span>
+            </>
+          )}
         </div>
       </div>
 

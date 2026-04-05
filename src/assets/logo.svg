@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180">
+  <g fill="#1a1a1a"
+     font-family="'Hiragino Mincho ProN', 'YuMincho', 'Noto Serif JP', serif"
+     font-size="96"
+     font-weight="200">
+    <text x="60" y="110" textLength="192" lengthAdjust="spacingAndGlyphs">賃貸</text>
+    <text x="580" y="110" text-anchor="end" textLength="192" lengthAdjust="spacingAndGlyphs">購入</text>
+  </g>
+  <text x="320" y="96" text-anchor="middle" fill="#1a1a1a"
+        font-family="'Helvetica Neue', Arial, sans-serif"
+        font-size="44" font-style="italic" font-weight="200">vs</text>
+  <line x1="60" y1="138" x2="580" y2="138" stroke="#1a1a1a" stroke-width="1"/>
+  <text x="60" y="162" textLength="520" lengthAdjust="spacing" fill="#1a1a1a"
+        font-family="'SF Mono', Menlo, 'Courier New', monospace"
+        font-size="10">RENT vs BUY &#8212; COST COMPARISON SIMULATOR</text>
+</svg>
