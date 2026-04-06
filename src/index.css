@@ -371,6 +371,15 @@ body {
   background: #f1f5f9;
 }
 
+.table-section tr.sale-row {
+  background: #fef9ee;
+  font-weight: 600;
+}
+
+.table-section tr.sale-row td:first-child {
+  color: var(--buy);
+}
+
 .invest-section {
   background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
   border: 1px solid #86efac;

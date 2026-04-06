@@ -28,6 +28,8 @@ export interface YearlyRow {
   managementCumulative: number;
   loanPaymentCumulative: number;
   salePrice: number;
+  saleFee: number;
+  buyCashflowCumulative: number;
   rentAnnual: number;
   buyAnnual: number;
   monthlyDiff: number;
@@ -199,6 +201,8 @@ export function calculate(inputs: Inputs): Result {
       managementCumulative: managementCum,
       loanPaymentCumulative: loanPaymentCum,
       salePrice,
+      saleFee,
+      buyCashflowCumulative: buyCashflowCum,
       rentAnnual,
       buyAnnual,
       monthlyDiff: cashflowDiff / 12,

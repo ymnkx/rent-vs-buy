@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { calculate, defaultInputs, type Inputs } from "./calc";
 import Chart from "./Chart";
 import logo from "./assets/logo.svg";
@@ -422,23 +422,41 @@ export default function App() {
           </thead>
           <tbody>
             {yearly.map((r) => {
+              const isLastYear = r.year === inputs.years;
               const effectiveRowDiff = showInvestment
                 ? r.rentCumulative - r.investmentGain - r.buyCumulative
                 : r.diff;
               return (
-                <tr key={r.year}>
-                  <td>{r.year}</td>
-                  <td>{fmt(r.rentCumulative)}</td>
-                  <td>{fmt(r.buyCumulative)}</td>
-                  <td>{fmt(r.diff)}</td>
-                  <td>{fmt(r.loanBalance)}</td>
-                  <td>{fmt(r.deductionCumulative)}</td>
-                  <td>{fmt(r.rentAnnual)}</td>
-                  <td>{fmt(r.buyAnnual)}</td>
-                  {showInvestment && <td>{fmt(r.monthlyInvestBase * 12)}</td>}
-                  {showInvestment && <td>{fmt(r.investmentGain)}</td>}
-                  <td>{effectiveRowDiff < 0 ? "🏠賃貸" : "🏢購入"}</td>
-                </tr>
+                <React.Fragment key={r.year}>
+                  <tr>
+                    <td>{r.year}</td>
+                    <td>{fmt(r.rentCumulative)}</td>
+                    <td>{fmt(isLastYear ? r.buyCashflowCumulative : r.buyCumulative)}</td>
+                    <td>{fmt(isLastYear ? r.rentCumulative - r.buyCashflowCumulative : r.diff)}</td>
+                    <td>{fmt(r.loanBalance)}</td>
+                    <td>{fmt(r.deductionCumulative)}</td>
+                    <td>{fmt(r.rentAnnual)}</td>
+                    <td>{fmt(r.buyAnnual)}</td>
+                    {showInvestment && <td>{fmt(r.monthlyInvestBase * 12)}</td>}
+                    {showInvestment && <td>{fmt(r.investmentGain)}</td>}
+                    <td>{isLastYear ? "" : effectiveRowDiff < 0 ? "🏠賃貸" : "🏢購入"}</td>
+                  </tr>
+                  {isLastYear && (
+                    <tr className="sale-row">
+                      <td>売却</td>
+                      <td></td>
+                      <td>{fmt(r.buyCumulative)}</td>
+                      <td>{fmt(r.diff)}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td>{fmt(-(r.salePrice - r.saleFee - r.loanBalance))}</td>
+                      {showInvestment && <td></td>}
+                      {showInvestment && <td></td>}
+                      <td>{effectiveRowDiff < 0 ? "🏠賃貸" : "🏢購入"}</td>
+                    </tr>
+                  )}
+                </React.Fragment>
               );
             })}
           </tbody>
