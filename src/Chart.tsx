@@ -24,7 +24,8 @@ export default function Chart({
     year: `${r.year}年`,
     賃貸累計: Math.round(r.rentCumulative),
     購入累計: Math.round(r.buyCumulative),
-    "賃貸(運用込み)": Math.round(r.rentCumulative - r.investmentGain),
+    "賃貸(運用込み)": Math.round(r.rentCumulative - r.rentInvestGain),
+    "購入(運用込み)": Math.round(r.buyCumulative - r.buyInvestGain),
   }));
 
   const lines = [
@@ -47,17 +48,33 @@ export default function Chart({
   ];
 
   if (showInvestment) {
-    lines.push(
-      <Line
-        key="invest"
-        type="monotone"
-        dataKey="賃貸(運用込み)"
-        stroke="#10b981"
-        strokeWidth={2}
-        strokeDasharray="5 5"
-        dot={false}
-      />,
-    );
+    const last = yearly[yearly.length - 1];
+    if (last?.rentInvestGain > 0) {
+      lines.push(
+        <Line
+          key="rent-invest"
+          type="monotone"
+          dataKey="賃貸(運用込み)"
+          stroke="#10b981"
+          strokeWidth={2}
+          strokeDasharray="5 5"
+          dot={false}
+        />,
+      );
+    }
+    if (last?.buyInvestGain > 0) {
+      lines.push(
+        <Line
+          key="buy-invest"
+          type="monotone"
+          dataKey="購入(運用込み)"
+          stroke="#f59e0b"
+          strokeWidth={2}
+          strokeDasharray="5 5"
+          dot={false}
+        />,
+      );
+    }
   }
 
   return (

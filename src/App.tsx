@@ -294,22 +294,62 @@ export default function App() {
           )}
         </div>
 
-        {showInvestment && (
-          <div className="summary-grid" style={{ marginBottom: 16 }}>
-            <div className="summary-card invest-section">
-              <div className="label">積立原資 合計</div>
-              <div className="value accent-color">
-                {fmt(summary.investPrincipal)}円
+        {showInvestment && (() => {
+          const hasRent = summary.rentInvestPrincipal > 0;
+          const hasBuy = summary.buyInvestPrincipal > 0;
+          const bothSides = hasRent && hasBuy;
+          return bothSides ? (
+            <div className="summary-grid" style={{ marginBottom: 16 }}>
+              <div className="invest-column">
+                <div className="summary-card invest-section">
+                  <div className="label">賃貸側 積立原資</div>
+                  <div className="value accent-color">{fmt(summary.rentInvestPrincipal)}円</div>
+                </div>
+                <div className="summary-card invest-section">
+                  <div className="label">賃貸側 運用総額</div>
+                  <div className="value accent-color">{fmt(summary.rentInvestGain)}円</div>
+                </div>
+              </div>
+              <div className="invest-column">
+                <div className="summary-card invest-section buy-invest">
+                  <div className="label">購入側 積立原資</div>
+                  <div className="value buy-invest-color">{fmt(summary.buyInvestPrincipal)}円</div>
+                </div>
+                <div className="summary-card invest-section buy-invest">
+                  <div className="label">購入側 運用総額</div>
+                  <div className="value buy-invest-color">{fmt(summary.buyInvestGain)}円</div>
+                </div>
               </div>
             </div>
-            <div className="summary-card invest-section">
-              <div className="label">運用総額</div>
-              <div className="value accent-color">
-                {fmt(summary.investmentGain)}円
-              </div>
+          ) : (
+            <div className="summary-grid" style={{ marginBottom: 16 }}>
+              {hasRent && (
+                <>
+                  <div className="summary-card invest-section">
+                    <div className="label">賃貸側 積立原資</div>
+                    <div className="value accent-color">{fmt(summary.rentInvestPrincipal)}円</div>
+                  </div>
+                  <div className="summary-card invest-section">
+                    <div className="label">賃貸側 運用総額</div>
+                    <div className="value accent-color">{fmt(summary.rentInvestGain)}円</div>
+                  </div>
+                </>
+              )}
+              {hasBuy && (
+                <>
+                  <div className="summary-card invest-section buy-invest">
+                    <div className="label">購入側 積立原資</div>
+                    <div className="value buy-invest-color">{fmt(summary.buyInvestPrincipal)}円</div>
+                  </div>
+                  <div className="summary-card invest-section buy-invest">
+                    <div className="label">購入側 運用総額</div>
+                    <div className="value buy-invest-color">{fmt(summary.buyInvestGain)}円</div>
+                  </div>
+                </>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         <div className="result-banner">
           {effectiveCheaper === "賃貸" ? "🏠" : "🏢"}{" "}
@@ -415,8 +455,10 @@ export default function App() {
               <th>控除累計</th>
               <th>賃貸年間</th>
               <th>購入年間</th>
-              {showInvestment && <th>年間積立額</th>}
-              {showInvestment && <th>運用総額</th>}
+              {showInvestment && <th>賃貸側積立</th>}
+              {showInvestment && <th>賃貸側運用</th>}
+              {showInvestment && <th>購入側積立</th>}
+              {showInvestment && <th>購入側運用</th>}
               <th>判定</th>
             </tr>
           </thead>
@@ -424,7 +466,7 @@ export default function App() {
             {yearly.map((r) => {
               const isLastYear = r.year === inputs.years;
               const effectiveRowDiff = showInvestment
-                ? r.rentCumulative - r.investmentGain - r.buyCumulative
+                ? (r.rentCumulative - r.rentInvestGain) - (r.buyCumulative - r.buyInvestGain)
                 : r.diff;
               return (
                 <React.Fragment key={r.year}>
@@ -437,8 +479,10 @@ export default function App() {
                     <td>{fmt(r.deductionCumulative)}</td>
                     <td>{fmt(r.rentAnnual)}</td>
                     <td>{fmt(r.buyAnnual)}</td>
-                    {showInvestment && <td>{fmt(r.monthlyInvestBase * 12)}</td>}
-                    {showInvestment && <td>{fmt(r.investmentGain)}</td>}
+                    {showInvestment && <td>{r.rentInvestBase > 0 ? fmt(r.rentInvestBase) : ""}</td>}
+                    {showInvestment && <td>{r.rentInvestGain > 0 ? fmt(r.rentInvestGain) : ""}</td>}
+                    {showInvestment && <td>{r.buyInvestBase > 0 ? fmt(r.buyInvestBase) : ""}</td>}
+                    {showInvestment && <td>{r.buyInvestGain > 0 ? fmt(r.buyInvestGain) : ""}</td>}
                     <td>{isLastYear ? "" : effectiveRowDiff < 0 ? "🏠賃貸" : "🏢購入"}</td>
                   </tr>
                   {isLastYear && (
@@ -451,6 +495,8 @@ export default function App() {
                       <td></td>
                       <td></td>
                       <td>{fmt(-(r.salePrice - r.saleFee - r.loanBalance))}</td>
+                      {showInvestment && <td></td>}
+                      {showInvestment && <td></td>}
                       {showInvestment && <td></td>}
                       {showInvestment && <td></td>}
                       <td>{effectiveRowDiff < 0 ? "🏠賃貸" : "🏢購入"}</td>

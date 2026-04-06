@@ -33,9 +33,12 @@ export interface YearlyRow {
   rentAnnual: number;
   buyAnnual: number;
   monthlyDiff: number;
-  monthlyInvestBase: number;
-  investPrincipal: number;
-  investmentGain: number;
+  rentInvestBase: number;
+  buyInvestBase: number;
+  rentInvestPrincipal: number;
+  buyInvestPrincipal: number;
+  rentInvestGain: number;
+  buyInvestGain: number;
 }
 
 export interface Summary {
@@ -43,8 +46,10 @@ export interface Summary {
   buyTotal: number;
   deductionTotal: number;
   diff: number;
-  investPrincipal: number;
-  investmentGain: number;
+  rentInvestPrincipal: number;
+  rentInvestGain: number;
+  buyInvestPrincipal: number;
+  buyInvestGain: number;
   diffWithInvestment: number;
   rentBreakdown: {
     rentSum: number;
@@ -122,8 +127,10 @@ export function calculate(inputs: Inputs): Result {
 
   const yearly: YearlyRow[] = [];
   let deductionCum = 0;
-  let investGainCum = 0;
-  let investPrincipalCum = 0;
+  let rentInvestPrincipalCum = 0;
+  let rentInvestGainCum = 0;
+  let buyInvestPrincipalCum = 0;
+  let buyInvestGainCum = 0;
   let buyCashflowCum = 0;
 
   for (let y = 1; y <= years; y++) {
@@ -183,12 +190,15 @@ export function calculate(inputs: Inputs): Result {
     const diff = rentCum - buyCum;
     const cashflowDiff = rentCashflow - buyCashflow;
 
-    // 差額運用: 賃貸が安い場合、その差額を積立
-    const monthlyInvestBase = cashflowDiff < 0 ? -cashflowDiff / 12 : 0;
+    // 差額運用: 安い方が差額を積立
+    const rentInvestBase = cashflowDiff < 0 ? -cashflowDiff : 0; // 賃貸が安い年
+    const buyInvestBase = cashflowDiff > 0 ? cashflowDiff : 0;   // 購入が安い年
 
-    // 年複利で積立運用
-    investPrincipalCum += monthlyInvestBase * 12;
-    investGainCum = investGainCum * (1 + investmentReturn) + monthlyInvestBase * 12;
+    // 年複利で積立運用（各側独立）
+    rentInvestPrincipalCum += rentInvestBase;
+    rentInvestGainCum = rentInvestGainCum * (1 + investmentReturn) + rentInvestBase;
+    buyInvestPrincipalCum += buyInvestBase;
+    buyInvestGainCum = buyInvestGainCum * (1 + investmentReturn) + buyInvestBase;
 
     yearly.push({
       year: y,
@@ -206,9 +216,12 @@ export function calculate(inputs: Inputs): Result {
       rentAnnual,
       buyAnnual,
       monthlyDiff: cashflowDiff / 12,
-      monthlyInvestBase,
-      investPrincipal: investPrincipalCum,
-      investmentGain: investGainCum,
+      rentInvestBase,
+      buyInvestBase,
+      rentInvestPrincipal: rentInvestPrincipalCum,
+      buyInvestPrincipal: buyInvestPrincipalCum,
+      rentInvestGain: rentInvestGainCum,
+      buyInvestGain: buyInvestGainCum,
     });
   }
 
@@ -223,9 +236,13 @@ export function calculate(inputs: Inputs): Result {
       buyTotal: last.buyCumulative,
       deductionTotal: deductionCum,
       diff: last.diff,
-      investPrincipal: investPrincipalCum,
-      investmentGain: investGainCum,
-      diffWithInvestment: last.rentCumulative - investGainCum - last.buyCumulative,
+      rentInvestPrincipal: rentInvestPrincipalCum,
+      rentInvestGain: rentInvestGainCum,
+      buyInvestPrincipal: buyInvestPrincipalCum,
+      buyInvestGain: buyInvestGainCum,
+      diffWithInvestment:
+        (last.rentCumulative - rentInvestGainCum) -
+        (last.buyCumulative - buyInvestGainCum),
       rentBreakdown: { rentSum, renewalSum, moveSum },
       buyBreakdown: {
         initialCost,
